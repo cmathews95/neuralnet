@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "NeuralNet/main.cpp"
-            timestampString = "465797268.868264"
+            timestampString = "465809288.869672"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "100"
-            endingLineNumber = "100"
+            startingLineNumber = "231"
+            endingLineNumber = "231"
             landmarkName = "main()"
             landmarkType = "7">
          </BreakpointContent>
@@ -26,11 +26,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "NeuralNet/main.cpp"
-            timestampString = "465799856.387803"
+            timestampString = "465809288.869672"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "96"
-            endingLineNumber = "96"
+            startingLineNumber = "100"
+            endingLineNumber = "100"
             landmarkName = "Neuron::sumDOW(const Layer &amp;nextLayer)"
             landmarkType = "5">
          </BreakpointContent>

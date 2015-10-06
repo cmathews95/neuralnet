@@ -34,7 +34,8 @@ public:
     void feedForward(const Layer &prevLayer);
     void calcOutputGradients(double targetVal);
     void calcHiddenGradients(const Layer &nextLayer);
-
+    void updateInputWeights(Layer &prevLayer);
+    
 private:
     static double transferFunction(double x);
     static double transferFunctionDerivative(double x);
@@ -45,10 +46,14 @@ private:
     vector<Connection> m_outputWeights;
     unsigned m_myIndex;
     double m_gradient;
+    static double eta; //(0->1)
+    static double alpha; //(0->n)
 };
 
 
 // * * * * * * * * * * * * Net Declaration * * * * * * * * * * * * * * *
+double Neuron::eta = 0.15; //learning rate
+double Neuron::alpha = 0.5; //momentum
 
 Neuron::Neuron(int numOutputs, unsigned myIndex){
     //c -> connection
@@ -90,7 +95,6 @@ void Neuron::calcOutputGradients(double targetVal){
 void Neuron::calcHiddenGradients(const Layer &nextLayer){
     double dow = sumDOW(nextLayer);
     m_gradient = dow * Neuron::transferFunctionDerivative(m_outputVal);
-    
 }
 
 double Neuron::sumDOW(const Layer &nextLayer) const{
@@ -98,8 +102,20 @@ double Neuron::sumDOW(const Layer &nextLayer) const{
     for(unsigned n = 0; n < nextLayer.size() - 1; ++n){
         sum += m_outputWeights[n].weight * nextLayer[n].m_gradient;
     }
-    
     return sum;
+}
+
+void Neuron::updateInputWeights(Layer &prevLayer){
+    for(unsigned n = 0; n < prevLayer.size(); ++n){
+        Neuron &neuron = prevLayer[n];
+        double oldDeltaWeight = neuron.m_outputWeights[m_myIndex].deltaWeight;
+        //individual input, magnified by gradient and train rate
+        double newDeltaWeight = eta //training rate 0-slow .2-medium 1-reckless
+        * neuron.getOutputVal() * m_gradient + alpha //alpha is momentum rate
+        * oldDeltaWeight;                            //0 is no/ .5 is moderate momentum
+        neuron.m_outputWeights[m_myIndex].deltaWeight = newDeltaWeight;
+        neuron.m_outputWeights[m_myIndex].weight += newDeltaWeight;
+    }
 }
 
 // * * * * * * * * * * * * class Net * * * * * * * * * * * * * * *
@@ -134,6 +150,8 @@ Net::Net(const vector<unsigned> &topology){
             m_layers.back().push_back(Neuron(numOutputs, neuronNum));
             cout << "made a Neuron" << endl;
         }
+        //make bias neuron 1.0
+        m_layers.back().back().setOutputVal(1.0);
     }
 }
 
@@ -199,6 +217,12 @@ void Net::backProp(const vector<double> &targetVals){
     }
 }
 
+void Net::getResults(vector<double> &resultVals) const{
+    resultVals.clear();
+    for(unsigned n = 0; n < m_layers.back().size() - 1; ++n) {
+        resultVals.push_back(m_layers.back()[n].getOutputVal());
+    }
+}
 
 int main(){
     //create Neural Net
@@ -209,16 +233,16 @@ int main(){
     topology.push_back(1); //1 output neuron
     Net myNet(topology);
     
-    //Train
-//    vector<double> inputVals;
-//    myNet.feedForward(inputVals);
+    //    Train
+    vector<double> inputVals;
+    myNet.feedForward(inputVals);
     
-//    vector<double> targetVals;
-//    myNet.backProp(targetVals);
-//    
-//    //Use Neural Net
-//    vector<double> resultVals;
-//    myNet.getResults(resultVals);
+    vector<double> targetVals;
+    myNet.backProp(targetVals);
+    
+    //Use Neural Net
+    vector<double> resultVals;
+    myNet.getResults(resultVals);
     
     
 }
